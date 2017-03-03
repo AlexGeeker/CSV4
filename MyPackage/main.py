@@ -226,18 +226,6 @@ if __name__ == '__main__':
     print '12:上个月各快递公司发件数'
     print '13：更新全部物流信息'
 
-    #for x in lastMonth_everyone_everyday_count('LiuYun'):
-    #    print x.NAME
-    #for x,y in lastMonth_everyone_everyday_count('LiuYun').items():
-    #    print x,y
-    #print session.query(Last_Month_Record).filter(Last_Month_Record.NAME == 'LiuYun', Last_Month_Record.DATE == '2017-02-06').count()
-
-    #query = session.query(Last_Month_Record).filter(Last_Month_Record.DANHAO.like('% %')).all()
-    #for x in query:
-    #    session.query(Last_Month_Record).filter(Last_Month_Record.DANHAO == x.DANHAO).update({Last_Month_Record.DANHAO: x.DANHAO.strip()})
-    #    print x.DANHAO,"已去除空格"
-    #session.commit()
-
     num = raw_input('请输入:')
     if num == '1':
         add_one_record('ed','3322968747930','2017-02-14')
