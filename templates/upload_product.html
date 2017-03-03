@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}上传文件{% endblock %}
+
+<!--显示结果 -->
+{% block page_content %}
+
+<div style="margin-top:20px;width:300px">
+    {{ wtf.quick_form(form) }}
+</div>
+
+
+<div style="margin-top:20px">
+    {% if message %}
+        <span style="color: red;">{{ message }} </span>
+    {% endif %}
+</div>
+
+<div style="margin-top:20px">
+    {% if name %}
+        图片名：{{ name }} <br>
+    {% endif %}
+</div>
+
+
+{% endblock %}

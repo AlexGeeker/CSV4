@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<meta name="renderer" content="webkit">  <!--默认使用极速核 -->
+
+{% block title %}首页{% endblock %}
+
+{% block page_content %}
+<!--
+  <script>
+    alert('Hello, world');
+  </script>
+-->
+<div style="width:500px">
+    {{ wtf.quick_form(form) }}
+</div>
+
+<div class="page-header">
+    {% if check_record %}
+        {% for danhao in check_record %}
+            <li>{{ danhao[0] }},&nbsp;{{ danhao[1] }},&nbsp;{{ danhao[2] }},&nbsp;{{ danhao[3] }}</li>
+        {% endfor %}
+    {% else %}
+        无记录
+    {% endif %}
+</div>
+
+<div style="margin-top:20px;width:800px">
+    <b>本月快递总数为：{{ total }}</b>
+</div>
+
+<!-- 昨天发件数统计-->
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>今天：<br></b>
+    {% for one in todayCount %}
+        {% if one == 'LiuYun' %}
+            <li>刘云:{{ todayCount[one] }}</li>
+        {% elif one == 'HuangShuo' %}
+            <li>黄硕:{{ todayCount[one] }}</li>
+        {% elif one == 'LiJinSheng' %}
+            <li>李金生:{{ todayCount[one] }}</li>
+        {% elif one == 'WeiSui' %}
+            <li>韦随:{{ todayCount[one] }}</li>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<!-- 昨天发件数统计-->
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>昨天：<br></b>
+    {% for one in yesterdayCount %}
+        {% if one == 'LiuYun' %}
+            <li>刘云:{{ yesterdayCount[one] }}</li>
+        {% elif one == 'HuangShuo' %}
+            <li>黄硕:{{ yesterdayCount[one] }}</li>
+        {% elif one == 'LiJinSheng' %}
+            <li>李金生:{{ yesterdayCount[one] }}</li>
+        {% elif one == 'WeiSui' %}
+            <li>韦随:{{ yesterdayCount[one] }}</li>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>本月：<br></b>
+    {% for kuaidi in kuaiditotal %}
+        {% if kuaidi == 'shentong' %}
+            <li>申通:{{ kuaiditotal[kuaidi] }}</li>
+        {% elif kuaidi == 'zhongtong' %}
+            <li>中通:{{ kuaiditotal[kuaidi] }}</li>
+        {% elif kuaidi == 'shunfeng' %}
+            <li>顺丰:{{ kuaiditotal[kuaidi] }}</li>
+        {% elif kuaidi == 'yousu' %}
+            <li>优速:{{ kuaiditotal[kuaidi] }}</li>
+        {% elif kuaidi == 'yuantong' %}
+            <li>圆通:{{ kuaiditotal[kuaidi] }}</li>
+        {% elif kuaidi == 'youzhengguonei' %}
+            <li>邮政:{{ kuaiditotal[kuaidi] }}</li>
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>本月：<br></b>
+    {% for one in everyoneCount %}
+        {% if one == 'LiuYun' %}
+            <li>刘云:{{ everyoneCount[one] }}</li>
+        {% elif one == 'HuangShuo' %}
+            <li>黄硕:{{ everyoneCount[one] }}</li>
+        {% elif one == 'LiJinSheng' %}
+            <li>李金生:{{ everyoneCount[one] }}</li>
+        {% elif one == 'WeiSui' %}
+            <li>韦随:{{ everyoneCount[one] }}</li>
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>上个月：<br></b>
+    {% for kuaidi in lastMonth_kuaidicount %}
+        {% if kuaidi == 'shentong' %}
+            <li>申通:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% elif kuaidi == 'zhongtong' %}
+            <li>中通:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% elif kuaidi == 'shunfeng' %}
+            <li>顺丰:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% elif kuaidi == 'yousu' %}
+            <li>优速:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% elif kuaidi == 'yuantong' %}
+            <li>圆通:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% elif kuaidi == 'youzhengguonei' %}
+            <li>邮政:{{ lastMonth_kuaidicount[kuaidi] }}</li>
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+<div style="margin-top:20px;margin-left:30px;float:left">
+    <b>上个月：<br></b>
+    {% for one in lastMonth_everyoneCount %}
+        {% if one == 'LiuYun' %}
+            <li><a href="/LiuYun"> 刘云:{{ lastMonth_everyoneCount[one] }}</a></li>
+        {% elif one == 'HuangShuo' %}
+            <li>黄硕:{{ lastMonth_everyoneCount[one] }}</li>
+        {% elif one == 'LiJinSheng' %}
+            <li>李金生:{{ lastMonth_everyoneCount[one] }}</li>
+        {% elif one == 'WeiSui' %}
+            <li>韦随:{{ lastMonth_everyoneCount[one] }}</li>
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+{% endblock %}

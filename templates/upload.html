@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}上传文件{% endblock %}
+
+<!--显示结果 -->
+{% block page_content %}
+<div style="margin-top:20px">
+    <b>{{ filename }}已记录{{ recorded }}条，重复数据{{ existed_record }}条未记录。 </b>
+</div>
+
+<div style="margin-top:20px">
+    <b>{{ filename }} {{ message }} </b>
+</div>
+
+<!--文件提交入口 -->
+
+<div style="margin-top:20px;margin-left:80px">
+<form id="form1" method="post" action="/api/upload" enctype="multipart/form-data">
+    <div>
+        <input id="File1" type="file" name="myfile"/>
+    </div>
+    <div style="margin-top:5px">
+        <input type="submit">
+    </div>
+</form>
+</div>
+
+<!--
+<form id="form1" method="POST" action="/api/upload" enctype="multipart/form-data">
+     {{ form.hidden_tag() }}
+
+     {{ form.file }}
+
+    <div style="margin-top:10px">
+     {{ form.name }}
+    </div>
+
+    <div style="margin-top:10px">
+     {{ form.submit }}
+    </div>
+
+</form>
+
+-->
+{% endblock %}

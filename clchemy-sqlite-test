@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+
+from sqlalchemy import create_engine
+eng = create_engine("sqlite:///C:/Users/Administrator/PycharmProjects/CSV/mycsv.db")
+conn = eng.connect()
+
+#conn.execute("create table x (a integer, b integer)")
+#conn.execute("insert into x (a, b) values (1, 1)")
+#conn.execute("insert into x (a, b) values (2, 2)")
+
+#result = conn.execute("select CSV4.NAME, CSV4.DANHAO from CSV4")
+
+#print result.keys()
+
+cursor = conn.execute("SELECT NAME,DANHAO,WULIU from CSV4")
+i = 0
+x = 0
+y = 0
+for row in cursor:
+    if row[2] == 'zhongtong':
+        i = i+1
+    if row[2] == 'shentong':
+        x = x+1
+    if row[2] == 'youzhengguonei':
+        y = y+1
+
+print "中通快递一共有",i,"个。"
+print "申通快递一共有",x,"个。"
+print "邮政快递一共有",y,"个。"
+
+conn.close()

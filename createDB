@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+import sqlite3
+
+conn = sqlite3.connect('mycsv.db')
+print "Opened database successfully";
+
+conn.execute('''create table kdtj201702
+        (ID INTEGER PRIMARY KEY AUTOINCREMENT NULL,
+        NAME TEXT NOT NULL,
+        DANHAO TEXT NOT NULL UNIQUE,
+        WULIU TEXT NOT NULL,
+        Timestamp DATETIME DEFAULT (datetime('now','localtime')));''')
+
+print "Table created successfully";
+
+conn.close()

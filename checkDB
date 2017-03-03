@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+import sqlite3
+
+conn = sqlite3.connect('mycsv.db')
+print "Opened database successfully";
+cursor = conn.execute("SELECT NAME,DANHAO,WULIU,Timestamp from CSV4")
+i = 0
+x = 0
+y = 0
+for row in cursor:
+    if row[2] == 'zhongtong':
+        i = i+1
+    if row[2] == 'shentong':
+        x = x+1
+    if row[2] == 'youzhengguonei':
+        y = y+1
+
+print "中通快递一共有",i,"个。"
+print "申通快递一共有",x,"个。"
+print "邮政快递一共有",y,"个。"
+
+conn.close()

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}产品{% endblock %}
+
+
+<!--显示结果 -->
+{% block page_content %}
+
+{% for product in allproducts %}
+     <a target="_blank" href="https://detail.tmall.com/item.htm?id={{ product.url_ID }}">{{product.name }}</a><br>
+    <div style="display:inline" align="left"><a href="{{ url_for('id_product',id=product.ID) }}"><img style="height:80px" src="/static/product_img/{{ product.img }}"></a></div>
+    <div style="display:inline;margin-left:20px;"  align="left">库存(120)</div>
+    <div style="display:inline;margin-left:20px;"  align="left">次品(20)</div>
+    <div style="display:inline;margin-left:20px;"  align="left">进货(已入库：20；待入库：200)</div>
+    <br>
+    {% if product.subProducts %}
+    {% for subproduct in product.subProducts %}
+        <li>{{ subproduct.name }}</li>
+    {% endfor %}
+    {% endif %}
+    <a href="{{ url_for('del_product',id=product.ID) }}">删除</a>
+    <a href="{{ url_for('edit_product',id=product.ID) }}">编辑</a>
+    <a href="{{ url_for('add_subproduct',id=product.ID) }}">添加颜色分类</a>
+    <hr style="border:1px dotted #CCC;width:1200px;">
+{% endfor %}
+
+
+
+{% endblock %}

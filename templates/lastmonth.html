@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}上传文件{% endblock %}
+
+{% block page_content %}
+
+{% for x in count %}
+    <li>{{ x[0][0] }} 发件数 {{ x[1] }}</li>
+{% endfor %}
+
+{% endblock %}

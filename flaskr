@@ -1,0 +1,180 @@
+# -*- coding: utf-8 -*-
+
+from flask import Flask
+from flask import render_template
+from flask import g
+import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy import *
+from sqlalchemy.orm import sessionmaker
+import time
+from flask import Flask, render_template
+from flask_script import Manager
+from flask_bootstrap import Bootstrap
+from flask_moment import Moment
+from flask_wtf import Form
+from wtforms import StringField, SubmitField
+from wtforms.validators import Required
+import os,shutil
+from flask import Flask, request, redirect, url_for,jsonify
+from werkzeug.utils  import secure_filename
+import base64
+from MyPackage import writeIntoDB
+from datetime import date,timedelta
+import datetime
+from flask_script import Manager
+
+# 常量
+
+dbDir = "sqlite:///C:/Users/Administrator/PycharmProjects/CSV/KDTJ.db"
+#tableName = 'KDTJ201701'
+tableName = 'KDTJ'+time.strftime("%Y%m", time.localtime())
+names = ['LiuYun', 'HuangShuo', 'LiJinSheng','WeiSui']
+kuaidiNames = ['shentong','zhongtong','shunfeng','yousu','youzhengguonei','yuantong']
+currentdate = time.strftime("%Y-%m-%d", time.localtime())
+yesterday = date.today() - timedelta(1)
+
+# 上个月的tablename
+today = datetime.date.today()
+first = today.replace(day=1)
+lastMonth = first - datetime.timedelta(days=1)
+lastMonthTable = 'KDTJ'+lastMonth.strftime("%Y%m")
+
+app = Flask(__name__)
+manager = Manager(app)
+app.config['SECRET_KEY'] = 'hard to guess string110120'
+bootstrap = Bootstrap(app)
+moment = Moment(app)
+
+class NameForm(Form):
+    name = StringField(u'单号查询，请输入单号：', validators=[Required()])
+    submit = SubmitField(u'提交')
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    # 创建数据库连接
+    db = create_engine(dbDir)
+    metadata = MetaData(db)
+    Session = sessionmaker(bind=db)
+    session = Session()
+    csvtable = Table(tableName, metadata, autoload=True)
+    lastMonth_csvtable = Table(lastMonthTable, metadata, autoload=True)
+
+    # 从网页获取单号
+    danhao = None
+    form = NameForm()
+    if form.validate_on_submit():
+        danhao = form.name.data
+        danhao = danhao.strip()  # strip()的作用是去掉左右空格
+        form.name.data = ''
+
+    # 从数据库中查询单号
+#    allDanhao = session.query(csvtable).filter(csvtable.c.DANHAO == danhao).all()
+    allDanhao = session.query(csvtable).filter(csvtable.c.DANHAO == danhao).all()+session.query(lastMonth_csvtable).filter(lastMonth_csvtable.c.DANHAO == danhao).all()
+    # 当月快递总数
+    allCount = session.query(csvtable).count()
+    # 当月各快递公司总数
+    kuaidicount = {}
+    for kuaidi in kuaidiNames:
+        count = session.query(csvtable).filter(csvtable.c.WULIU == kuaidi).count()
+        kuaidicount[kuaidi] = count
+    # 每人当月发件数
+    everyoneCount = {}
+    for name in names:
+        count = session.query(csvtable).filter(csvtable.c.NAME == name).count()
+        everyoneCount[name] = count
+    # 每人昨天发件数
+    yesterdayCount = {}
+    for name in names:
+        count = session.query(csvtable).filter(and_(csvtable.c.NAME == name,csvtable.c.DATE == yesterday)).count()
+        yesterdayCount[name] = count
+    # 每人当天发件数
+    todayCount = {}
+    for name in names:
+        count = session.query(csvtable).filter(and_(csvtable.c.NAME == name,csvtable.c.DATE == currentdate)).count()
+        todayCount[name] = count
+    # 上个月各快递公司总数
+    lastMonth_kuaidicount = {}
+    for kuaidi in kuaidiNames:
+        lastMonth_count = session.query(lastMonth_csvtable).filter(lastMonth_csvtable.c.WULIU == kuaidi).count()
+        lastMonth_kuaidicount[kuaidi] = lastMonth_count
+    # 每人上个月发件数
+    lastMonth_everyoneCount = {}
+    for name in names:
+        count = session.query(lastMonth_csvtable).filter(lastMonth_csvtable.c.NAME == name).count()
+        lastMonth_everyoneCount[name] = count
+    # 关闭session
+    session.close()
+    return render_template('index.html', form=form, name=allDanhao,total=allCount,kuaiditotal = kuaidicount,everyoneCount=everyoneCount,yesterdayCount = yesterdayCount,todayCount = todayCount,lastMonth_kuaidicount = lastMonth_kuaidicount,lastMonth_everyoneCount = lastMonth_everyoneCount)
+
+#上传文件
+
+UPLOAD_FOLDER='upload'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+basedir = os.path.abspath(os.path.dirname(__file__))
+ALLOWED_EXTENSIONS = set(['csv'])
+
+# 用于判断文件后缀
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
+
+# 用于测试上传，稍后用到
+@app.route('/test/upload')
+def upload_test():
+    return render_template('upload.html')
+
+# 上传文件
+@app.route('/api/upload',methods=['POST'],strict_slashes=False)
+def api_upload():
+    file_dir=os.path.join(basedir,app.config['UPLOAD_FOLDER']) # 文件路径
+    if not os.path.exists(file_dir): # 如果文件夹不存在，则创建文件夹
+        os.makedirs(file_dir)
+    f=request.files['myfile']  # 从表单的file字段获取文件，myfile为该表单的name值
+    if f and allowed_file(f.filename):  # 判断是否是允许上传的文件类型
+        fname=secure_filename(f.filename)
+        print fname
+#        ext = fname.rsplit('.',1)[1]  # 获取文件后缀
+#        unix_time = int(time.time())
+#        new_filename=str(unix_time)+'.'+ext  # 修改了上传的文件名
+
+        # 判断是否存在重复文件名，若不存在，则保存文件
+        ii = 0
+        for parent, dirnames, filenames in os.walk(file_dir):  # 遍历目录并调用数据库写入函数
+            for filename in filenames:
+                if filename == fname:
+                    ii = ii+1
+        if ii == 0:
+            f.save(os.path.join(file_dir, fname))  # 保存文件到upload目录
+        else:
+            return render_template('upload.html',filename = fname,message=u'该文件已存在，请重新上传！')
+
+#        token = base64.b64encode(new_filename)
+#        print token
+
+        # 判断CSV文档是否已经保存在本月及上个月数据库中
+        if writeIntoDB.CsvIsInDB(dbDir,tableName,os.path.join(file_dir,fname)) or writeIntoDB.CsvIsInDB(dbDir,lastMonthTable,os.path.join(file_dir,fname)):
+            os.remove(os.path.join(file_dir,fname))
+            return render_template('upload.html', filename=fname, message=u'该文档有3条以上单号已经存在，请确认后再上传！')
+
+        # 将csv文件写入数据库
+        i = writeIntoDB.WriteCsvToDB(dbDir,tableName,os.path.join(file_dir,fname))
+        counti = u"共导入数据:"+str(i)
+
+        # 创建当天日期文件夹，并将文件转移至该文件夹
+        currentday_file_dir = os.path.join(file_dir,time.strftime("%Y-%m-%d", time.localtime()))
+        if not os.path.exists(currentday_file_dir):  # 如果文件夹不存在，则创建文件夹
+            os.makedirs(currentday_file_dir)
+        shutil.move(os.path.join(file_dir,fname),currentday_file_dir)
+
+        return render_template('upload.html',filename = fname,message=u'上传成功,',count = counti)
+#        return jsonify({"errno":0,"errmsg":"上传成功","token":token})
+    else:
+        return render_template('upload.html',message=u"文件错误，上传失败！")
+#        return jsonify({"errno":1001,"errmsg":"上传失败"})
+
+@app.route('/api/uploaded_data')
+def upladed_data():
+    return render_template('uploaded_data.html')
+
+if __name__ == '__main__':
+    app.run()
